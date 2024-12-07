@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  lambda:
+    image: lambci/lambda:python3.9
+    volumes:
+      - ./:/var/task # Mount current directory to /var/task inside the container
+    command: lambda_code.lambda_handler
+    ports:
+      - "9000:8080" # Map port 8080 (Lambda runtime port) to 9000 on the host
+    environment:
+      # Any environment variables your Lambda function needs
+      # Example:
+      # - DYNAMODB_TABLE_NAME=your_dynamodb_table_name
