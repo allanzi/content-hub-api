@@ -1,4 +1,9 @@
 variable "aws_region" {
-  default   = "eu-west-3"
+  default   = "us-east-1"
   type      = string
+}
+
+variable "STAGE" {
+  type    = string
+  default = "local"
 }

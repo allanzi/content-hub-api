@@ -139,9 +139,7 @@ resource "aws_api_gateway_method" "POST_method" {
   rest_api_id   = aws_api_gateway_rest_api.API-gw.id
   resource_id   = aws_api_gateway_resource.API-resource-dish.id
   http_method   = "POST"
-  # authorization = "NONE"
-  authorization = "COGNITO_USER_POOLS"
-  authorizer_id = aws_api_gateway_authorizer.demo.id
+  authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "POST_lambda_integration" {
@@ -197,9 +195,7 @@ resource "aws_api_gateway_method" "PATCH_method" {
   rest_api_id   = aws_api_gateway_rest_api.API-gw.id
   resource_id   = aws_api_gateway_resource.API-resource-dish.id
   http_method   = "PATCH"
-  # authorization = "NONE"
-  authorization = "COGNITO_USER_POOLS"
-  authorizer_id = aws_api_gateway_authorizer.demo.id
+  authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "PATCH_lambda_integration" {
@@ -248,9 +244,7 @@ resource "aws_api_gateway_method" "DELETE_method" {
   rest_api_id   = aws_api_gateway_rest_api.API-gw.id
   resource_id   = aws_api_gateway_resource.API-resource-dish.id
   http_method   = "DELETE"
-  # authorization = "NONE"
-  authorization = "COGNITO_USER_POOLS"
-  authorizer_id = aws_api_gateway_authorizer.demo.id
+  authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "DELETE_lambda_integration" {
@@ -374,15 +368,4 @@ resource "aws_api_gateway_method_settings" "my_settings" {
     data_trace_enabled = true
     metrics_enabled = true
   }
-}
-
-################################
-#### Authentication ####
-################################
-
-resource "aws_api_gateway_authorizer" "demo" {
-  name = "my_apig_authorizer2"
-  rest_api_id = aws_api_gateway_rest_api.API-gw.id
-  type = "COGNITO_USER_POOLS"
-  provider_arns = [aws_cognito_user_pool.pool.arn]
 }

@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
-    bucket = "my-api-gateway-lambda-terraform-state"
-    region = "eu-west-3"
+    bucket = "content-hub-api-lambda-terraform-state"
+    region = "us-east-1"
     key    = "API-Gateway/terraform.tfstate"
   }
   required_version = ">= 0.13.0"
