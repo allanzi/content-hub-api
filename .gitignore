@@ -35,4 +35,6 @@ terraform.rc
 
 volume/
 
-lambda_code.zip
+*.zip
+
+venv/

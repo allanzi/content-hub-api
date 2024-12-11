@@ -19,6 +19,12 @@ resource "aws_api_gateway_resource" "API-resource-dishes" {
   path_part   = "dishes"
 }
 
+resource "aws_api_gateway_resource" "API-resource-login" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  parent_id   = aws_api_gateway_rest_api.API-gw.root_resource_id
+  path_part   = "login"
+}
+
 #####################################################################################################
 ########################### GET ALL /dishes #########################################################
 #####################################################################################################
@@ -131,6 +137,42 @@ resource "aws_api_gateway_integration_response" "GET_one_integration_response_20
   }
 }
 
+resource "aws_api_gateway_method_response" "GET_one_method_response_401" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  resource_id = aws_api_gateway_resource.API-resource-dish.id
+  http_method = aws_api_gateway_method.GET_one_method.http_method
+  status_code = "401"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers"     = true,
+    "method.response.header.Access-Control-Allow-Methods"     = true,
+    "method.response.header.Access-Control-Allow-Origin"      = true,
+    "method.response.header.Access-Control-Allow-Credentials" = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "GET_one_integration_response_401" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  resource_id = aws_api_gateway_resource.API-resource-dish.id
+  http_method = aws_api_gateway_method.GET_one_method.http_method
+  status_code = aws_api_gateway_method_response.GET_one_method_response_401.status_code
+
+  depends_on = [aws_api_gateway_integration.GET_one_lambda_integration]
+
+  response_templates = {
+    "application/json" = <<EOF
+    #set($inputRoot = $input.path('$.body'))
+    {
+      \"statusCode\": 401,
+      \"body\": $inputRoot,
+      \"headers\": {
+        \"Content-Type\": \"application/json\"
+      }
+    }
+    EOF
+  }
+}
+
 #####################################################################################################
 ########################### POST /dish #########################################################
 #####################################################################################################
@@ -178,6 +220,42 @@ resource "aws_api_gateway_integration_response" "POST_integration_response_200" 
     #set($inputRoot = $input.path('$.body'))
     {
       \"statusCode\": 200,
+      \"body\": $inputRoot,
+      \"headers\": {
+        \"Content-Type\": \"application/json\"
+      }
+    }
+    EOF
+  }
+}
+
+resource "aws_api_gateway_method_response" "POST_method_response_401" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  resource_id = aws_api_gateway_resource.API-resource-dish.id
+  http_method = aws_api_gateway_method.POST_method.http_method
+  status_code = "401"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers"     = true,
+    "method.response.header.Access-Control-Allow-Methods"     = true,
+    "method.response.header.Access-Control-Allow-Origin"      = true,
+    "method.response.header.Access-Control-Allow-Credentials" = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "POST_integration_response_401" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  resource_id = aws_api_gateway_resource.API-resource-dish.id
+  http_method = aws_api_gateway_method.POST_method.http_method
+  status_code = aws_api_gateway_method_response.POST_method_response_401.status_code
+
+  depends_on = [aws_api_gateway_integration.POST_lambda_integration]
+
+  response_templates = {
+    "application/json" = <<EOF
+    #set($inputRoot = $input.path('$.body'))
+    {
+      \"statusCode\": 401,
       \"body\": $inputRoot,
       \"headers\": {
         \"Content-Type\": \"application/json\"
@@ -236,6 +314,35 @@ resource "aws_api_gateway_integration_response" "PATCH_integration_response_200"
   }
 }
 
+resource "aws_api_gateway_method_response" "PATCH_method_response_401" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  resource_id = aws_api_gateway_resource.API-resource-dish.id
+  http_method = aws_api_gateway_method.PATCH_method.http_method
+  status_code = "401"
+}
+
+resource "aws_api_gateway_integration_response" "PATCH_integration_response_401" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  resource_id = aws_api_gateway_resource.API-resource-dish.id
+  http_method = aws_api_gateway_method.PATCH_method.http_method
+  status_code = aws_api_gateway_method_response.PATCH_method_response_401.status_code
+
+  depends_on = [aws_api_gateway_integration.PATCH_lambda_integration]
+
+  response_templates = {
+    "application/json" = <<EOF
+    #set($inputRoot = $input.path('$.body'))
+    {
+      \"statusCode\": 401,
+      \"body\": $inputRoot,
+      \"headers\": {
+        \"Content-Type\": \"application/json\"
+      }
+    }
+    EOF
+  }
+}
+
 #####################################################################################################
 ########################### DELETE /dish #########################################################
 #####################################################################################################
@@ -276,6 +383,127 @@ resource "aws_api_gateway_integration_response" "DELETE_integration_response_200
     #set($inputRoot = $input.path('$.body'))
     {
       \"statusCode\": 200,
+      \"body\": $inputRoot,
+      \"headers\": {
+        \"Content-Type\": \"application/json\"
+      }
+    }
+    EOF
+  }
+}
+
+resource "aws_api_gateway_method_response" "DELETE_method_response_401" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  resource_id = aws_api_gateway_resource.API-resource-dish.id
+  http_method = aws_api_gateway_method.DELETE_method.http_method
+  status_code = "401"
+}
+
+resource "aws_api_gateway_integration_response" "DELETE_integration_response_401" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  resource_id = aws_api_gateway_resource.API-resource-dish.id
+  http_method = aws_api_gateway_method.DELETE_method.http_method
+  status_code = aws_api_gateway_method_response.DELETE_method_response_401.status_code
+
+  depends_on = [aws_api_gateway_integration.DELETE_lambda_integration]
+
+  response_templates = {
+    "application/json" = <<EOF
+    #set($inputRoot = $input.path('$.body'))
+    {
+      \"statusCode\": 401,
+      \"body\": $inputRoot,
+      \"headers\": {
+        \"Content-Type\": \"application/json\"
+      }
+    }
+    EOF
+  }
+}
+
+#####################################################################################################
+########################### POST /login #########################################################
+#####################################################################################################
+
+resource "aws_api_gateway_method" "POST_login_method" {
+  rest_api_id   = aws_api_gateway_rest_api.API-gw.id
+  resource_id   = aws_api_gateway_resource.API-resource-login.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "POST_login_lambda_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.API-gw.id
+  resource_id             = aws_api_gateway_resource.API-resource-login.id
+  http_method             = aws_api_gateway_method.POST_login_method.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.my-lambda-function.invoke_arn
+}
+
+resource "aws_api_gateway_method_response" "POST_login_method_response_200" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  resource_id = aws_api_gateway_resource.API-resource-login.id
+  http_method = aws_api_gateway_method.POST_login_method.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers"     = true,
+    "method.response.header.Access-Control-Allow-Methods"     = true,
+    "method.response.header.Access-Control-Allow-Origin"      = true,
+    "method.response.header.Access-Control-Allow-Credentials" = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "POST_login_integration_response_200" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  resource_id = aws_api_gateway_resource.API-resource-login.id
+  http_method = aws_api_gateway_method.POST_login_method.http_method
+  status_code = aws_api_gateway_method_response.POST_login_method_response_200.status_code
+
+  depends_on = [aws_api_gateway_integration.POST_login_lambda_integration]
+
+  response_templates = {
+    "application/json" = <<EOF
+    #set($inputRoot = $input.path('$.body'))
+    {
+      \"statusCode\": 200,
+      \"body\": $inputRoot,
+      \"headers\": {
+        \"Content-Type\": \"application/json\"
+      }
+    }
+    EOF
+  }
+}
+
+resource "aws_api_gateway_method_response" "POST_login_method_response_401" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  resource_id = aws_api_gateway_resource.API-resource-login.id
+  http_method = aws_api_gateway_method.POST_login_method.http_method
+  status_code = "401"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers"     = true,
+    "method.response.header.Access-Control-Allow-Methods"     = true,
+    "method.response.header.Access-Control-Allow-Origin"      = true,
+    "method.response.header.Access-Control-Allow-Credentials" = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "POST_login_integration_response_401" {
+  rest_api_id = aws_api_gateway_rest_api.API-gw.id
+  resource_id = aws_api_gateway_resource.API-resource-login.id
+  http_method = aws_api_gateway_method.POST_login_method.http_method
+  status_code = aws_api_gateway_method_response.POST_login_method_response_401.status_code
+
+  depends_on = [aws_api_gateway_integration.POST_login_lambda_integration]
+
+  response_templates = {
+    "application/json" = <<EOF
+    #set($inputRoot = $input.path('$.body'))
+    {
+      \"statusCode\": 401,
       \"body\": $inputRoot,
       \"headers\": {
         \"Content-Type\": \"application/json\"

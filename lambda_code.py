@@ -3,6 +3,8 @@ import logging
 import boto3
 from decimal import Decimal
 from botocore.exceptions import ClientError
+from urllib.parse import quote, unquote
+from base64 import b64decode, b64encode
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -12,6 +14,7 @@ table = dynamodb.Table('dishes')
 
 dish_path = '/dish'
 dishes_path = '/dishes'
+login_path = '/login'
 
 def lambda_handler(event, context):
         
@@ -22,23 +25,48 @@ def lambda_handler(event, context):
     try: 
         http_method = event.get('httpMethod')
         path = event.get('path')
+        authorizationToken = event.get('headers').get('Authorization')
+
+        logger.info('Authrization Token: {}'.format(authorizationToken))
         
         if http_method == 'GET' and path == dishes_path:
             response = get_all_dishes()
             
         elif http_method == 'GET' and path == dish_path:
+            validate_jwt_token(authorizationToken)
+
             dish_id = event['queryStringParameters']['dish_id']
             response = get_dish(dish_id)
             
-        elif http_method == 'POST' and path == dish_path:
+        elif http_method == 'POST' and path == login_path:
+            body = json.loads(event['body'])
+
+            username = body['username']
+            password = body['password']
+
+            if not username or not password:
+                return generate_response(400, 'Username and password are required')
+
+            username_password = f'{quote(body['username'])}:{body['password']}'
+            token = f'{b64encode(username_password.encode()).decode()}'
+
+            return generate_response(200, {'token': token})
+        
+        elif http_method == 'POST' and path == dishes_path:
+            validate_jwt_token(authorizationToken)
+
             body = json.loads(event['body'])
             response = save_dish(body)
             
         elif http_method == 'PATCH' and path == dish_path:
+            validate_jwt_token(authorizationToken)
+
             body = json.loads(event['body'])
             response = update_dish(body['dish_id'], body['update_key'], body['update_value'])
             
         elif http_method == 'DELETE':
+            validate_jwt_token(authorizationToken)
+
             body = json.loads(event['body'])
             response = delete_dish(body['dish_id'])
             
@@ -50,6 +78,32 @@ def lambda_handler(event, context):
         response = generate_response(404, e.response['Error']['Message'])
         
     return response
+
+def validate_jwt_token(token_to_validate):
+    if not token_to_validate:
+        return generate_response(401, 'Token Not Found')
+
+    split = token_to_validate.strip().split(' ')
+
+    if len(split) == 1:
+        try:
+            username, password = b64decode(split[0]).decode().split(':', 1)
+        except:
+            return generate_response(401, 'Unauthorized')
+
+    elif len(split) == 2:
+        if split[0].strip().lower() == 'basic':
+            try:
+                username, password = b64decode(split[1]).decode().split(':', 1)
+            except:
+                return generate_response(401, 'Unauthorized')
+        else:
+            return generate_response(401, 'Unauthorized')
+
+    else:
+        return generate_response(401, 'Unauthorized')
+
+    return unquote(username), unquote(password)
         
 def get_dish(dish_id):
     try:
