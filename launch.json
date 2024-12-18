@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "pwa-node",
+            "request": "launch",
+            "name": "Debug Serverless",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "debug"
+            ],
+           "sourceMaps": true,
+           "attachSimplePort": 9229
+        }
+    ]
+}
